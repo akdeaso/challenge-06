@@ -5,6 +5,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Login from '../screens/Login';
 import Home from '../screens/Home';
 import Scan from '../screens/Scan';
+import Crash from '../screens/Crash';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -13,6 +14,7 @@ const BottomTab = () => {
   return (
     <Tab.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
       <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Crash" component={Crash} />
       <Tab.Screen name="Scan" component={Scan} />
     </Tab.Navigator>
   );
