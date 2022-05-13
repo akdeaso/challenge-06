@@ -31,10 +31,6 @@ const Login = ({navigation}) => {
   useEffect(() => {
     onLogScreenView();
     crashlytics().log('App mounted.');
-    GoogleSignin.configure({
-      webClientId:
-        '428507265986-3cj2kqrhn80ja7msjkp2pti63p72o2f9.apps.googleusercontent.com',
-    });
   }, []);
 
   const onEvent = async () => {
