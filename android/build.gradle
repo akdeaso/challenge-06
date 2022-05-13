@@ -10,6 +10,7 @@ buildscript {
         targetSdkVersion = 31
         playServiceVersion = '17.0.0'
         kotlin_version = '1.5.10'
+        googlePlayServicesAuthVersion = "19.2.0"
 
         if (System.properties['os.arch'] == "aarch64") {
             // For M1 Users we need to use the NDK 24 which added support for aarch64

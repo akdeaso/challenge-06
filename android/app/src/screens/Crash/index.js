@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignContent: 'center',
     justifyContent: 'flex-end',
+    backgroundColor: '#191932',
   },
   button: {
     marginHorizontal: ms(10),

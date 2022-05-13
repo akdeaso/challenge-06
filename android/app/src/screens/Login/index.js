@@ -1,10 +1,35 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {ms} from 'react-native-size-matters';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 const Login = ({navigation}) => {
+  GoogleSignin.configure({
+    webClientId:
+      '428507265986-3cj2kqrhn80ja7msjkp2pti63p72o2f9.apps.googleusercontent.com',
+  });
+
+  const _signIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log(userInfo);
+    } catch (error) {
+      console.log(error);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      } else {
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={{alignItems: 'center', marginTop: ms(16)}}>
@@ -37,6 +62,13 @@ const Login = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
+      <Text style={styles.separator}>----- Or Sign In with -----</Text>
+      <GoogleSigninButton
+        style={styles.buttonGoogle}
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={_signIn}
+      />
     </View>
   );
 };
@@ -100,6 +132,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  buttonGoogle: {
+    alignSelf: 'center',
+    width: '100%',
+  },
   buttonText: {
     fontSize: ms(14),
     color: 'white',
@@ -115,5 +151,9 @@ const styles = StyleSheet.create({
     color: '#779ECB',
     fontSize: ms(12),
     fontWeight: '700',
+  },
+  separator: {
+    alignSelf: 'center',
+    marginVertical: ms(5),
   },
 });

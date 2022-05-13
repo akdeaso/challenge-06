@@ -19,6 +19,8 @@ target 'firebaseApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'TouchID', :path => '../node_modules/react-native-touch-id'
+
   target 'firebaseAppTests' do
     inherit! :complete
     # Pods for testing
