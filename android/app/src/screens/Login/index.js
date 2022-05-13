@@ -1,5 +1,5 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {useEffect} from 'react';
+import {StyleSheet, Text, View, Alert} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {ms} from 'react-native-size-matters';
@@ -8,18 +8,67 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import TouchID from 'react-native-touch-id';
+import auth from '@react-native-firebase/auth';
+import analytics from '@react-native-firebase/analytics';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const Login = ({navigation}) => {
-  GoogleSignin.configure({
-    webClientId:
-      '428507265986-3cj2kqrhn80ja7msjkp2pti63p72o2f9.apps.googleusercontent.com',
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const onLogScreenView = async () => {
+    try {
+      await analytics().logScreenView({
+        screen_name: 'Login Screen',
+        screen_class: 'Login Screen',
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    onLogScreenView();
+    crashlytics().log('App mounted.');
+    GoogleSignin.configure({
+      webClientId:
+        '428507265986-3cj2kqrhn80ja7msjkp2pti63p72o2f9.apps.googleusercontent.com',
+    });
+  }, []);
+
+  const onEvent = async () => {
+    await analytics().logLogin({
+      method: 'Email',
+    });
+  };
+
+  const signInForm = () => {
+    onEvent();
+    if (email.length !== 0 && password.length !== 0) {
+      auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(res => {
+          crashlytics().log('User Signed In');
+          console.log('USER UID: ', res.user.uid);
+          navigation.navigate('BottomTab');
+        })
+        .catch(error => {
+          crashlytics().log('User Sign In Error');
+          crashlytics().recordError(error);
+          Alert.alert('Error', error.message);
+        });
+    } else {
+      Alert.alert('Error', 'Invalid Credentials');
+    }
+  };
 
   const _signIn = async () => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       console.log(userInfo);
+      navigation.navigate('BottomTab');
     } catch (error) {
       console.log(error);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -28,6 +77,16 @@ const Login = ({navigation}) => {
       } else {
       }
     }
+  };
+
+  const pressHandler = () => {
+    TouchID.authenticate('Tes biometric sign in')
+      .then(() => {
+        navigation.navigate('BottomTab');
+      })
+      .catch(error => {
+        alert('Auth Failed');
+      });
   };
 
   return (
@@ -44,16 +103,20 @@ const Login = ({navigation}) => {
           style={styles.textInput}
           placeholder="Enter Email"
           placeholderTextColor="gray"
+          onChangeText={text => setEmail(text)}
         />
         <TextInput
           style={styles.textInput}
           placeholder="Password Here"
           placeholderTextColor="gray"
           secureTextEntry={true}
+          onChangeText={text => setPassword(text)}
         />
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('BottomTab')}>
+          onPress={() => {
+            signInForm();
+          }}>
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
         <View style={{alignItems: 'flex-end'}}>
@@ -62,13 +125,18 @@ const Login = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
-      <Text style={styles.separator}>----- Or Sign In with -----</Text>
+      <Text style={styles.separator}>----- Or -----</Text>
       <GoogleSigninButton
         style={styles.buttonGoogle}
         size={GoogleSigninButton.Size.Wide}
         color={GoogleSigninButton.Color.Dark}
-        onPress={_signIn}
+        onPress={() => {
+          _signIn();
+        }}
       />
+      <TouchableOpacity style={styles.button} onPress={() => pressHandler()}>
+        <Text style={styles.buttonText}>Biometric Sign In</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -135,6 +203,7 @@ const styles = StyleSheet.create({
   buttonGoogle: {
     alignSelf: 'center',
     width: '100%',
+    marginBottom: ms(10),
   },
   buttonText: {
     fontSize: ms(14),

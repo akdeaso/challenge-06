@@ -33,8 +33,8 @@ const onSetupCloudMessaging = async () => {
 const onLogScreenView = async () => {
   try {
     await analytics().logScreenView({
-      screen_name: 'Home',
-      screen_class: 'Home',
+      screen_name: 'Crash Tes',
+      screen_class: 'Crash Tes',
     });
   } catch (error) {
     console.log(error);
